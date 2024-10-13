@@ -47,7 +47,7 @@ def load_models():
     pos_vector = load(fr"{cur_dir}/model/vectorizer.pkl")
 
     # Load language detection model
-    lang_model = fasttext.load_model(fr'{cur_dir}/model/lid.176.bin')
+    lang_model = fasttext.load_model(fr'{cur_dir}/model/lid.176.ftz')
 
     nltk.download("names")
     nltk.download('wordnet')

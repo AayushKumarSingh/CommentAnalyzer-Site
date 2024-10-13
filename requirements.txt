@@ -7,7 +7,6 @@ click==8.1.7
 colorama==0.4.6          
 Django==5.1.1            
 django-cors-headers==4.4.0
-fasttext @ file://./fasttext-0.9.3-cp37-cp37m-linux_armv6l.whl
 google-api-core==2.20.0
 google-api-python-client==2.146.0
 google-auth==2.35.0

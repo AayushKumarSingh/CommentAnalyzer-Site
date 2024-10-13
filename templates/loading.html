@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Processing Comments{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center h-[90%]">
+    <div class="loader-container bg-white bg-opacity-10 rounded-3xl p-6 shadow-2xl backdrop-blur-md w-11/12 max-w-md">
+        <h1 class="loader-heading">Processing Comments</h1>
+        <p class="text-white mb-4 text-sm">Analyzing and extracting insights, please wait...</p>
+
+        <div class="progress-container bg-white bg-opacity-20 rounded-full overflow-hidden p-1 mb-4 h-[24px]">
+            <div id="progress-bar" class="progress-bar text-xs font-medium text-blue-100 text-center rounded-full" style="width: 0%">0%</div>
+        </div>
+
+        <div id="progress-message" class="text-white text-sm font-semibold"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let progress = 0;
+        const totalTime = {{ total_comments }} * 25;
+        const intervalTime = 100 + 0.05 * {{ total_comments }};
+
+        const messages = [
+            "Fetching comments...",
+            "Analyzing sentiment...",
+            "Extracting key topics...",
+            "Generating insights...",
+            "Preparing results..."
+        ];
+
+        function updateProgress() {
+            if (progress < 99) {
+                progress++;
+                const progressBar = document.getElementById('progress-bar');
+                progressBar.style.width = progress + "%";
+                progressBar.textContent = progress + "%";
+                
+                const messageIndex = Math.floor(progress / 20);
+                document.getElementById('progress-message').textContent = messages[messageIndex];
+
+                progressBar.classList.add("pulse");
+                setTimeout(() => progressBar.classList.remove("pulse"), 500);
+            }
+        }
+
+        const interval = setInterval(updateProgress, intervalTime);
+
+        fetch("{% url 'process_data' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    clearInterval(interval);
+                    const progressBar = document.getElementById('progress-bar');
+                    progressBar.style.width = "100%";
+                    progressBar.textContent = "100%";
+                    document.getElementById('progress-message').textContent = "Analysis complete!";
+
+                    setTimeout(function () {
+                        window.location.href = "{% url 'results' %}";
+                    }, 1000);
+                }
+            })
+            .catch(error => {
+                clearInterval(interval);
+                alert('Error occurred while processing the data.');
+            });
+    });
+</script>
+
+<style>
+    .loader-container {
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .loader-heading {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .progress-container {
+        height: 20px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .progress-bar {
+        transition: width 0.4s ease;
+        background: linear-gradient(90deg, #00f260, #0575e6);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 242, 96, 0.5);
+    }
+
+    .progress-bar::after {
+        content: '';
+        position: relative;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0) 100%
+        );
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .pulse {
+        animation: pulse 0.5s ease-in-out;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Video{% endblock %}
+
+{% block content %}
+<div class="loader-container mx-auto">
+    <h1 class="loader-heading">Submit YouTube Video</h1>
+    <p class="text-white mb-6">Enter the URL of the YouTube video you want to analyze:</p>
+
+    <form method="POST" action="" class="space-y-6">
+        {% csrf_token %}
+        <div>
+            <label for="video_url" class="block text-white font-semibold mb-2">YouTube URL</label>
+            <input type="url" name="video_url" id="video_url" required class="w-full p-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-white::placeholder focus:outline-none focus:ring-2 focus:ring-white">
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn">Analyze Comments</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

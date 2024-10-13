@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Analysis Results{% endblock %}
+
+{% block content %}
+<div class="container mx-auto p-4">
+    <h2 class="text-center text-3xl font-bold mb-8 text-white">Analysis Results</h2>
+
+    <!-- Summary and Comment Breakdown -->
+    <div class="bg-white bg-opacity-10 shadow-lg rounded-xl px-8 py-6 mb-8 backdrop-blur-md">
+        <h3 class="text-2xl font-semibold text-center mb-6 text-white">Summary</h3>
+        <div class="text-center">
+            <p class="text-white text-4xl font-bold mb-2">
+                <span class="text-5xl">{{ total_comments }}</span>
+                <span class="text-2xl"> out of {{ actual_total }}</span>
+            </p>
+            <p class="text-gray-300 text-3xl font-bold mb-2">({{ percentage }}%)</p>
+            <p class="text-gray-300 text-xl">Total Comments Analyzed</p>
+        </div>
+    </div>
+
+    <!-- Sentiment Section -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+        <div class="bg-green-500 bg-opacity-20 border-l-4 border-green-500 text-green-100 p-6 rounded-lg shadow-md">
+            <div class="text-center">
+                <p class="text-3xl font-bold mb-2">{{ positive_comments }}</p>
+                <p class="text-xl">Positive Comments</p>
+            </div>
+        </div>
+        <div class="bg-gray-500 bg-opacity-20 border-l-4 border-gray-500 text-gray-100 p-6 rounded-lg shadow-md">
+            <div class="text-center">
+                <p class="text-3xl font-bold mb-2">{{ neutral_comments }}</p>
+                <p class="text-xl">Neutral Comments</p>
+            </div>
+        </div>
+        <div class="bg-red-500 bg-opacity-20 border-l-4 border-red-500 text-red-100 p-6 rounded-lg shadow-md">
+            <div class="text-center">
+                <p class="text-3xl font-bold mb-2">{{ negative_comments }}</p>
+                <p class="text-xl">Negative Comments</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spam and Violence Section -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+        <div class="bg-orange-500 bg-opacity-20 border-l-4 border-orange-500 text-orange-100 p-6 rounded-lg shadow-md">
+            <div class="text-center">
+                <p class="text-3xl font-bold mb-2">{{ spam_comments }}</p>
+                <p class="text-xl">Spam Comments</p>
+            </div>
+        </div>
+        <div class="bg-red-700 bg-opacity-20 border-l-4 border-red-700 text-red-100 p-6 rounded-lg shadow-md">
+            <div class="text-center">
+                <p class="text-3xl font-bold mb-2">{{ violent_comments }}</p>
+                <p class="text-xl">Violent Comments</p>
+            </div>
+        </div>
+        <div class="bg-blue-500 bg-opacity-20 border-l-4 border-blue-500 text-blue-100 p-6 rounded-lg shadow-md">
+            <div class="text-center">
+                <p class="text-3xl font-bold mb-2">{{ top_language }}</p>
+                <p class="text-xl">Top Language</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie Charts Section -->
+    <div class="mb-12">
+        <h3 class="text-center text-2xl font-bold mb-8 text-white">Comment Distribution</h3>
+
+        <div class="flex flex-col md:flex-row gap-8">
+            <!-- Sentiment Pie Chart -->
+            <div class="w-full md:w-1/3 bg-white bg-opacity-10 rounded-xl shadow-lg p-6 backdrop-blur-md" style="height: 400px;">
+                <h4 class="text-center font-semibold mb-4 text-white text-xl">Sentiment Analysis</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Spam Pie Chart -->
+            <div class="w-full md:w-1/3 bg-white bg-opacity-10 rounded-xl shadow-lg p-6 backdrop-blur-md" style="height: 400px;">
+                <h4 class="text-center font-semibold mb-4 text-white text-xl">Spam Detection</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="spamChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Violence Pie Chart -->
+            <div class="w-full md:w-1/3 bg-white bg-opacity-10 rounded-xl shadow-lg p-6 backdrop-blur-md" style="height: 400px;">
+                <h4 class="text-center font-semibold mb-4 text-white text-xl">Violence Detection</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="violenceChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Insights Section -->
+    <div class="bg-white bg-opacity-10 shadow-lg rounded-xl px-8 py-6 mb-8 backdrop-blur-md">
+        <h3 class="text-2xl font-semibold text-center mb-6 text-white">Key Insights</h3>
+        <ul class="list-disc pl-6 text-white">
+            <li class="mb-3 text-lg">The overall sentiment of the comments is predominantly {{ predominant_sentiment }}.</li>
+            <li class="mb-3 text-lg">{{ spam_percentage }}% of the comments were identified as potential spam.</li>
+            <li class="mb-3 text-lg">{{ violent_percentage }}% of the comments contained violent content.</li>
+            <li class="mb-3 text-lg">The most common language used in the comments is {{ top_language }}.</li>
+        </ul>
+    </div>
+
+    <!-- Analyze Another Video Button -->
+    <div class="mt-8 text-center">
+        <a href="{% url 'youtube_input' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-110">
+            Analyze Another Video
+        </a>
+    </div>
+</div>
+
+<!-- JavaScript for Pie Charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: 'white',
+                        font: {
+                            size: 14
+                        }
+                    }
+                }
+            }
+        };
+
+        // Pie Chart for Sentiment Distribution
+        new Chart(document.getElementById('sentimentChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Positive', 'Neutral', 'Negative'],
+                datasets: [{
+                    data: [{{ positive_comments }}, {{ neutral_comments }}, {{ negative_comments }}],
+                    backgroundColor: ['rgba(56, 161, 105, 0.8)', 'rgba(203, 213, 224, 0.8)', 'rgba(229, 62, 62, 0.8)'],
+                    borderColor: ['#38A169', '#CBD5E0', '#E53E3E'],
+                    borderWidth: 2
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Pie Chart for Spam Distribution
+        new Chart(document.getElementById('spamChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Spam', 'Non-Spam'],
+                datasets: [{
+                    data: [{{ spam_comments }}, {{ total_comments }} - {{ spam_comments }}],
+                    backgroundColor: ['rgba(237, 137, 54, 0.8)', 'rgba(203, 213, 224, 0.8)'],
+                    borderColor: ['#ED8936', '#CBD5E0'],
+                    borderWidth: 2
+                }]
+            },
+            options: chartOptions
+        });
+
+        // Pie Chart for Violence Distribution
+        new Chart(document.getElementById('violenceChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Violence', 'Non-Violence'],
+                datasets: [{
+                    data: [{{ violent_comments }}, {{ total_comments }} - {{ violent_comments }}],
+                    backgroundColor: ['rgba(197, 48, 48, 0.8)', 'rgba(203, 213, 224, 0.8)'],
+                    borderColor: ['#C53030', '#CBD5E0'],
+                    borderWidth: 2
+                }]
+            },
+            options: chartOptions
+        });
+    });
+</script>
+{% endblock %}

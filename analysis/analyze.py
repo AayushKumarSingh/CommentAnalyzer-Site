@@ -28,6 +28,13 @@ lang_model = None
 class ModelsNotLoadedError(Exception):
     pass
 
+
+def safe_nltk_download(resource):
+    try:
+        nltk.find(resource)
+    except LookupError:
+        nltk.download(resource.split("/")[-1])
+
 def load_models():
     """
     Function to load models once and reuse them
@@ -49,9 +56,9 @@ def load_models():
     # Load language detection model
     lang_model = fasttext.load_model(fr'{cur_dir}/model/lid.176.ftz')
 
-    nltk.download("names")
-    nltk.download('wordnet')
-    nltk.download("stopwords")
+    safe_nltk_download("corpora/names")
+    safe_nltk_download("corpora/wordnet")
+    safe_nltk_download("corpora/stopwords")
 
     all_names = set(names.words())
     lemmatizer = WordNetLemmatizer()

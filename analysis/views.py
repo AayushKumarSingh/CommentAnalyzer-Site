@@ -4,16 +4,12 @@ import requests
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 import pandas as pd
-from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from concurrent.futures import ThreadPoolExecutor
 from .analyze import compute
 
 
-load_dotenv(dotenv_path=".env")
-
-
-API_KEY = os.getenv("YouTube_API")
+API_KEY = os.getenv("API_KEY", "")
 
 
 def get_client_ip(request):

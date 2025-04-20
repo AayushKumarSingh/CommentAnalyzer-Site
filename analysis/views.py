@@ -83,7 +83,7 @@ def youtube_input(request):
     if request.method == "POST":
         print(get_client_ip(request))
         video_url = request.POST.get('video_url')
-        video_id = video_url.split('v=')[-1].split("&t=")[0].split("?feature=")[0]
+        video_id = video_url.split('v=')[-1].split("&t=")[0].split("?feature=")[0].split("&ab_channel=")[0].split("&list=")[0]
 
         # Store the video_id in session
         request.session['video_id'] = video_id

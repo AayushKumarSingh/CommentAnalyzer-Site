@@ -162,7 +162,6 @@ def process_data(request):
 
 def results(request):
     # Retrieve the results from session
-    print(load_dotenv(dotenv_path=".env"))
     analysis_results = request.session.get('analysis_results')
 
     if not analysis_results:

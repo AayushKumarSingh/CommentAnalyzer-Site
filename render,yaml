@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: comment-analyzer
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn CommentAnalyzer.wsgi

@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: my-django-app
+    runtime: python
+    pythonVersion: 3.11
+    region: oregon  # or frankfurt, singapore, etc.
+    buildCommand: |
+      pip install --upgrade pip
+      pip install --cache-dir=.cache/pip --only-binary=:all: -r requirements.txt
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn CommentAnalyzer.wsgi:application --bind 0.0.0.0:$PORT
+    plan: free
+    build:
+      cacheDirs:
+        - .cache/pip
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: CommentAnalyzer.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PIP_NO_BUILD_ISOLATION
+        value: "false"
+      - key: PIP_ONLY_BINARY
+        value: ":all:"
